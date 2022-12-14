@@ -4,6 +4,7 @@ gem 'sinatra'
 gem 'puma'
 gem 'http'
 
-group 'test' do
-  gem 'rack-test'
+group :test do
+  gem "rspec"
+  gem "rack-test"
 end

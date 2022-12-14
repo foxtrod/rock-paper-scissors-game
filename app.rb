@@ -7,8 +7,8 @@ CONFIG = YAML.load_file('config.yml')
 post '/play' do
   content_type 'application/json'
 
-  player_hand = params['choice']
-  opponent_hand = GamingService.new.fetch!
+  player_hand = JSON.parse(request.body.read)['choice']
+  opponent_hand = CurbServerThrow.fetch!
   game = Game.new(player_hand, opponent_hand).call
 
   if game.success?
@@ -48,22 +48,16 @@ class Game
         'loss'
       end
 
-    success_response(result)
-  end
-
-  private
-
-  def success_response(geolocation)
-    OpenStruct.new(success?: true, result: geolocation)
+    OpenStruct.new(success?: true, result: result)
   end
 end
 
-class GamingService
+class CurbServerThrow
   HOST = CONFIG['host']
 
   class NetworkError < StandardError; end
 
-  def fetch!
+  def self.fetch!
     response = client.get("#{HOST}")
     raise NetworkError, response unless response.status.success?
 
